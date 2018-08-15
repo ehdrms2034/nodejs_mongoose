@@ -77,7 +77,7 @@ app.get('/room/make',function(req,res){
         date : times,
         parent_friend : 'null',
 
-    })
+    });
     room.save();
     relation.save();
     console.log("mongoose: Healer 방 개설 완료");
@@ -87,6 +87,7 @@ app.get('/room/make',function(req,res){
 ////////////////////방참가///////////////////
 app.get('/room/join',function(req,res){
     // 여기는 room_name 과 user_id를 이용해서 추가 시켜서 방참가 시켜놓는거
+    // friend_id는 추천인 이름
     res.writeHead(200,{'Content-Type': 'text/html; charset=utf-8'});
     room_database.update({room_name : req.query.room_name}, {$push : {room_people_list : [{people_id:req.query.user_id}] },$inc : {room_people : 1}},function(err,doc){  
         if(err)console.log("에러");
@@ -94,12 +95,38 @@ app.get('/room/join',function(req,res){
         
     });
 
+    let time = new Date();
+    let times = time.toLocaleDateString()+" "+time.toLocaleTimeString();    
+
+    /* Relation 부분 추가 */
     //추천인이 있을경우
     if(req.query.friend_id!=null){
         console.log("추천인 있음");
+
+        let relation = new room_relation({
+            room_name : req.query.room_name,
+            user_id : req.query.user_id,
+            date : times,
+            parent_friend : req.query.friend_id,
+        });
+        room_relation.update({room_name : req.query.room_name , user_id : req.query.friend_id}, {$push  : {children_friend : [{friend_id : req.query.user_id}]}},function(err,doc){
+            if(err)console.log("relation error");
+            else console.log(doc + "추천인 연결 성공");
+        });
+        relation.save();
         
-    }else{
+        //부모데이터베이스와 자식 데이터 베이스 연결
+
+    }else{ //없을경우
         console.log("추천인 없음");
+        let relation = new room_relation({
+            room_name : req.query.room_name,
+            user_id : req.query.room_owner,
+            date : times,
+            parent_friend : 'null',
+        });
+        relation.save();
+        console.log("user 한명이 방에 참가 하였음");
     }
 
     //방에대한 유저에대한 관계 데이터베이스 부분 추가
