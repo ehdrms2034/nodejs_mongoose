@@ -1,4 +1,2 @@
-# nodejs_mongoose
-
-
-** Healer에 들어갈 서버 백엔드 부분을 구현하는 곳
+# Healer Serverside
+Node.js ,mongoose 를 이용해서 Healer App의 Server Side 측면 개발하는 곳
