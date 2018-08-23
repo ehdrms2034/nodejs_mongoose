@@ -1,0 +1,23 @@
+@import './styles/utils';
+
+.box{
+
+  display : inline-block;
+  width: $size;
+  height: $size;
+  border: 1px solid black;
+  position : fixed;
+
+ @include place-at-center();
+
+  &.blue{
+    background: blue;
+  }
+  &:hover {
+    background: yellow;
+  }
+  &:active{
+    background: red;
+  }
+  
+}
